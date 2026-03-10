@@ -18,17 +18,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Meebles">
         <activity
+            android:name=".DeveloperPage"
+            android:exported="false" />
+        <activity
             android:name=".InfoPage"
             android:exported="false" />
         <activity
             android:name=".EnvironmentPage"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".TutorialPage"
             android:exported="false" />
         <activity
             android:name=".HomePage"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".WelcomePage"
             android:exported="true">

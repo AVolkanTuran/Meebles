@@ -31,11 +31,22 @@ public class WelcomePage extends AppCompatActivity {
 
         Button b = findViewById(R.id.start_button);
 
+        // Normal click -> HomePage
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), HomePage.class);
                 startActivity(i);
+            }
+        });
+
+        // Long click -> DeveloperPage
+        b.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Intent i = new Intent(getApplicationContext(), DeveloperPage.class);
+                startActivity(i);
+                return true; // important: tells Android the event was handled
             }
         });
     }
