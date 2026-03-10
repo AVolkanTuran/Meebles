@@ -7,4 +7,90 @@
     android:layout_height="match_parent"
     tools:context=".EnvironmentPage">
 
+    <ImageButton
+        android:id="@+id/environment_go_back_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="25dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/go_back"
+        android:background="null"
+        android:scaleType="centerCrop"/>
+
+    <ImageButton
+        android:id="@+id/info_open_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="25dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/exclamation"
+        android:background="null"
+        android:scaleType="centerCrop"/>
+
+    <ImageView
+        android:id="@+id/volcano_city"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="100dp"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toTopOf="@id/nfc_number_et"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:src="@drawable/PlaceholderVolcanoCity"/>
+
+    <ImageView
+        android:id="@+id/volcano_meeble"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="@id/volcano_city"
+        app:layout_constraintLeft_toLeftOf="@id/volcano_city"
+        app:layout_constraintRight_toRightOf="@id/volcano_city"
+        android:src="@drawable/PlaceholderVolcanoMeeble"/>
+
+    <EditText
+        android:id="@+id/nfc_number_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter a Number"
+        android:inputType="number"
+        android:layout_marginBottom="25dp"
+        android:textAlignment="center"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/withdraw_deposit_toggle" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/withdraw_deposit_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="50dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:checkedButton="@+id/withdraw">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/withdraw"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Withdraw" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button2"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Deposit" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
