@@ -46,22 +46,36 @@
             android:inputType="number"
             android:layout_marginBottom="24dp"/>
 
-        <Button
-            android:id="@+id/read_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Read NFC Tag"
-            android:backgroundTint="#EDF4C1"
-            android:textColor="#EB5A3D"
-            android:layout_marginBottom="12dp"/>
 
-        <Button
-            android:id="@+id/write_button"
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/read_write_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginBottom="50dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
             android:backgroundTint="#EDF4C1"
             android:textColor="#EB5A3D"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Write NFC Tag"/>
+            app:checkedButton="@+id/read_button">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/read_button"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Read NFC Tag" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/write_button"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Write NFC Tag" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
     </LinearLayout>
 

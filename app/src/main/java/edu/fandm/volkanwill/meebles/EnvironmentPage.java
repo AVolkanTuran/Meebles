@@ -83,7 +83,7 @@ public class EnvironmentPage extends AppCompatActivity {
             Log.d("", "Tag Discovered: " + tag.toString());
             EditText et = (EditText) findViewById(R.id.nfc_number_et);
             int value = Integer.parseInt(et.getText().toString());
-            EnvironmentData data = readFromTag(tag);
+            EnvironmentData data = HomePage.readFromTag(tag);
 
             MaterialButtonToggleGroup mbtg = (MaterialButtonToggleGroup) findViewById(R.id.withdraw_deposit_toggle);
             int selectedId = mbtg.getCheckedButtonId();
@@ -96,89 +96,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 data.setTime(LocalTime.now());
             }
 
-            writeToTag(data, tag);
+            HomePage.writeToTag(data, tag);
         }
-    }
-
-
-    private void writeToTag(EnvironmentData data, Tag tag) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(data);
-            oos.flush();
-            byte[] serializedData = bos.toByteArray();
-
-            String mimeType = "application/edu.fandm.volkanwill.meebles.environmentdata";
-            NdefRecord record = NdefRecord.createMime(mimeType, serializedData);
-
-
-            NdefMessage message = new NdefMessage(new NdefRecord[]{record});
-
-            formatAndWriteToTag(tag, message);
-
-            oos.close();
-            bos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void formatAndWriteToTag(Tag tag, NdefMessage message) {
-        Ndef ndef = Ndef.get(tag);
-
-        try {
-            if (ndef != null) {
-                ndef.connect();
-                if (!ndef.isWritable()) {
-                    return;
-                }
-                if (ndef.getMaxSize() < message.getByteArrayLength()) {
-                    return;
-                }
-                ndef.writeNdefMessage(message);
-            } else {
-                NdefFormatable formattable = NdefFormatable.get(tag);
-                if (formattable != null) {
-                    formattable.connect();
-                    formattable.format(message);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private EnvironmentData readFromTag(Tag tag) {
-        Ndef ndef = Ndef.get(tag);
-        EnvironmentData data = new EnvironmentData(0,'0','0',LocalTime.now());
-        try {
-            ndef.connect();
-            NdefMessage msg = ndef.getNdefMessage();
-            if (msg != null && msg.getRecords().length > 0) {
-                byte[] payload = msg.getRecords()[0].getPayload();
-                try (ByteArrayInputStream bis = new ByteArrayInputStream(payload);
-                     ObjectInputStream ois = new ObjectInputStream(bis)) {
-                    data = (EnvironmentData) ois.readObject();
-                    return data;
-                }
-                catch (ClassNotFoundException | ClassCastException e) {
-                    Log.e("NFC_READ", "Class mismatch or not found", e);
-                }
-            }
-            else {
-                Log.e("NFC_READ", "Tag is empty.");
-            }
-        } catch (Exception e) {
-            // Handle read error
-            e.printStackTrace();
-        }finally {
-            try {
-                ndef.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return data;
     }
 }
