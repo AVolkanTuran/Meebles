@@ -15,7 +15,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/go_back"
-        android:background="null"
+        android:background="@null"
         android:scaleType="centerCrop"/>
 
     <ImageButton
@@ -26,7 +26,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/exclamation"
-        android:background="null"
+        android:background="@null"
         android:scaleType="centerCrop"/>
 
     <TextView
@@ -68,7 +68,7 @@
         app:layout_constraintBottom_toTopOf="@id/nfc_number_et"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:src="@drawable/PlaceholderVolcanoCity"/>
+        android:src="@drawable/placeholder_volcano_city"/>
 
     <ImageView
         android:id="@+id/meeble_image"
@@ -79,7 +79,7 @@
         app:layout_constraintBottom_toBottomOf="@id/environment_image"
         app:layout_constraintLeft_toLeftOf="@id/environment_image"
         app:layout_constraintRight_toRightOf="@id/environment_image"
-        android:src="@drawable/PlaceholderVolcanoMeeble"/>
+        android:src="@drawable/placeholder_volcano_meeble"/>
 
     <EditText
         android:id="@+id/nfc_number_et"

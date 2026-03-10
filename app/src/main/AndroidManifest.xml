@@ -16,17 +16,16 @@
             android:exported="false" />
         <activity
             android:name=".EnvironmentPage"
-            android:exported="false" />
+            android:exported="true">
         <activity
             android:name=".TutorialPage"
             android:exported="false" />
         <activity
             android:name=".HomePage"
-            android:exported="false"
-            android:theme="@style/Theme.Meebles" />
+            android:exported="false"/>
         <activity
             android:name=".WelcomePage"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

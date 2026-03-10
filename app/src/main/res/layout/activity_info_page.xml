@@ -15,7 +15,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/info_close"
-        android:background="null"
+        android:background="@null"
         android:scaleType="centerCrop"/>
 
     <TextView
@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:src="@drawable/PlaceHolderImage"/>
+        android:src="@drawable/placeholder_exponential"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
