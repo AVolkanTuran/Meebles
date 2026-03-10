@@ -113,7 +113,7 @@
             android:text="Withdraw" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button2"
+            android:id="@+id/deposit"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
