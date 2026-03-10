@@ -1,7 +1,6 @@
 package edu.fandm.volkanwill.meebles;
 
 import android.content.Intent;
-import android.media.audiofx.EnvironmentalReverb;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -29,6 +28,8 @@ import java.io.ObjectOutputStream;
 import java.time.LocalTime;
 
 public class EnvironmentPage extends AppCompatActivity {
+
+    public static NfcAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 }
             } else if(selectedId == R.id.deposit){
                 data.setMeebleCount(data.getMeebleCount()+value);
+                data.setTime(LocalTime.now());
             }
 
             writeToTag(data, tag);
@@ -157,7 +159,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 byte[] payload = msg.getRecords()[0].getPayload();
                 try (ByteArrayInputStream bis = new ByteArrayInputStream(payload);
                      ObjectInputStream ois = new ObjectInputStream(bis)) {
-                    EnvironmentData data = (EnvironmentData) ois.readObject();
+                    data = (EnvironmentData) ois.readObject();
                     return data;
                 }
                 catch (ClassNotFoundException | ClassCastException e) {
