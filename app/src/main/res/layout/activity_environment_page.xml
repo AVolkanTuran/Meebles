@@ -29,8 +29,38 @@
         android:background="null"
         android:scaleType="centerCrop"/>
 
+    <TextView
+        android:id="@+id/environment_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Environment: Volcano"
+        app:layout_constraintBottom_toTopOf="@id/city_type"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="35dp"/>
+
+    <TextView
+        android:id="@+id/city_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type: City"
+        app:layout_constraintBottom_toTopOf="@id/meeble_count"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="35dp"/>
+
+    <TextView
+        android:id="@+id/meeble_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="There are 1 Meeble(s)."
+        app:layout_constraintBottom_toTopOf="@id/environment_image"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="50dp"/>
+
     <ImageView
-        android:id="@+id/volcano_city"
+        android:id="@+id/environment_image"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:layout_margin="100dp"
@@ -41,14 +71,14 @@
         android:src="@drawable/PlaceholderVolcanoCity"/>
 
     <ImageView
-        android:id="@+id/volcano_meeble"
+        android:id="@+id/meeble_image"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:adjustViewBounds="true"
-        app:layout_constraintBottom_toBottomOf="@id/volcano_city"
-        app:layout_constraintLeft_toLeftOf="@id/volcano_city"
-        app:layout_constraintRight_toRightOf="@id/volcano_city"
+        app:layout_constraintBottom_toBottomOf="@id/environment_image"
+        app:layout_constraintLeft_toLeftOf="@id/environment_image"
+        app:layout_constraintRight_toRightOf="@id/environment_image"
         android:src="@drawable/PlaceholderVolcanoMeeble"/>
 
     <EditText
