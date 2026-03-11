@@ -1,17 +1,14 @@
 package edu.fandm.volkanwill.meebles;
 
 import android.content.Intent;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,10 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.IOException;
 import java.time.LocalTime;
 
 public class EnvironmentPage extends AppCompatActivity {
@@ -90,13 +84,18 @@ public class EnvironmentPage extends AppCompatActivity {
             if(selectedId == R.id.withdraw){
                 if(value < data.getMeebleCount()) {
                     data.setMeebleCount(data.getMeebleCount() - value);
+                    data.setTime(LocalTime.now());
                 }
             } else if(selectedId == R.id.deposit){
                 data.setMeebleCount(data.getMeebleCount()+value);
                 data.setTime(LocalTime.now());
             }
 
-            HomePage.writeToTag(data, tag);
+            try{
+                HomePage.writeToTag(data, tag);
+            } catch (IOException e) {
+                runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
+            }
         }
     }
 }

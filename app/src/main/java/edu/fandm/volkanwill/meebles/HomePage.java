@@ -11,18 +11,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalTime;
@@ -34,7 +33,6 @@ public class HomePage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home_page);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -78,7 +76,7 @@ public class HomePage extends AppCompatActivity {
 
     }
 
-    public static void writeToTag(EnvironmentData data, Tag tag) {
+    public static void writeToTag(EnvironmentData data, Tag tag) throws IOException {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -96,12 +94,15 @@ public class HomePage extends AppCompatActivity {
             formatAndWriteToTag(tag, message);
 
             bos.close();
-        } catch (Exception e) {
+        }catch(IOException e){
+            throw new IOException(e);
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void formatAndWriteToTag(Tag tag, NdefMessage message) {
+    public static void formatAndWriteToTag(Tag tag, NdefMessage message) throws IOException {
         Ndef ndef = Ndef.get(tag);
 
         try {
@@ -121,7 +122,9 @@ public class HomePage extends AppCompatActivity {
                     formattable.format(message);
                 }
             }
-        } catch (Exception e) {
+        }catch(IOException e){
+            throw new IOException(e);
+        }catch (Exception e) {
             e.printStackTrace();
         }
         finally{

@@ -1,14 +1,10 @@
 package edu.fandm.volkanwill.meebles;
 
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,19 +12,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.IOException;
 import java.time.LocalTime;
 
 public class DeveloperPage extends AppCompatActivity {
 
     private NfcAdapter adapter;
-
+    private int savedMeebleCount;
+    private char savedCityType;
+    private char savedEnvType;
+    private int savedButtonId = R.id.read_button;
     EditText meebleET;
     EditText cityET;
     EditText envET;
+    MaterialButtonToggleGroup mbtg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +34,33 @@ public class DeveloperPage extends AppCompatActivity {
 
         adapter = NfcAdapter.getDefaultAdapter(this);
 
+        meebleET = findViewById(R.id.meeble_et);
+        cityET = findViewById(R.id.city_type_et);
+        envET = findViewById(R.id.environment_type_et);
+        mbtg = findViewById(R.id.read_write_toggle);
+
+        // Save values whenever user changes them
+        meebleET.addTextChangedListener(new SimpleTextWatcher() {
+            public void onTextChanged(CharSequence s, int a, int b, int c) {
+                if (!s.toString().isEmpty())
+                    savedMeebleCount = Integer.parseInt(s.toString());
+            }
+        });
+        cityET.addTextChangedListener(new SimpleTextWatcher() {
+            public void onTextChanged(CharSequence s, int a, int b, int c) {
+                if (!s.toString().isEmpty())
+                    savedCityType = s.charAt(0);
+            }
+        });
+        envET.addTextChangedListener(new SimpleTextWatcher() {
+            public void onTextChanged(CharSequence s, int a, int b, int c) {
+                if (!s.toString().isEmpty())
+                    savedEnvType = s.charAt(0);
+            }
+        });
+        mbtg.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) savedButtonId = checkedId;
+        });
 
     }
 
@@ -56,40 +80,30 @@ public class DeveloperPage extends AppCompatActivity {
 
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
         @Override
-        public void onTagDiscovered(Tag tag){
-            Log.d("", "Tag Discovered: " + tag.toString());
-            meebleET = findViewById(R.id.meeble_et);
-            cityET = findViewById(R.id.city_type_et);
-            envET = findViewById(R.id.environment_type_et);
-            runOnUiThread(() -> {
-                try {
-                    MaterialButtonToggleGroup mbtg = findViewById(R.id.read_write_toggle);
-                    int selectedId = mbtg.getCheckedButtonId();
-
-                    if (selectedId == R.id.write_button) {
-                        int meebleCount = Integer.parseInt(meebleET.getText().toString());
-                        char cityType = cityET.getText().toString().charAt(0);
-                        char envType  = envET.getText().toString().charAt(0);
-                        EnvironmentData data = new EnvironmentData(meebleCount, cityType, envType, LocalTime.now());
-
-                        new Thread(() -> HomePage.writeToTag(data, tag)).start();
-
-                    } else if (selectedId == R.id.read_button) {
-                        new Thread(() -> {
-                            EnvironmentData readData = HomePage.readFromTag(tag);
-                            if (readData != null) {
-                                runOnUiThread(() -> {
-                                    meebleET.setText(String.valueOf(readData.getMeebleCount()));
-                                    cityET.setText(String.valueOf(readData.getCityType()));
-                                    envET.setText(String.valueOf(readData.getEnvironmentType()));
-                                });
-                            }
-                        }).start();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+        public void onTagDiscovered(Tag tag) {
+            if (savedButtonId == R.id.write_button) {
+                EnvironmentData data = new EnvironmentData(savedMeebleCount, savedCityType, savedEnvType, LocalTime.now());
+                try{
+                    HomePage.writeToTag(data, tag);}
+                catch (IOException e) {
+                    runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
                 }
-            });
+
+            } else if (savedButtonId == R.id.read_button) {
+                EnvironmentData readData = HomePage.readFromTag(tag);
+                if (readData != null) {
+                    runOnUiThread(() -> {
+                        meebleET.setText(String.valueOf(readData.getMeebleCount()));
+                        cityET.setText(String.valueOf(readData.getCityType()));
+                        envET.setText(String.valueOf(readData.getEnvironmentType()));
+                    });
+                }
+            }
         }
+    }
+
+    public abstract class SimpleTextWatcher implements TextWatcher {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        public void afterTextChanged(Editable s) {}
     }
 }
