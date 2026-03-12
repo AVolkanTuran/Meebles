@@ -92,9 +92,9 @@ public class EnvironmentPage extends AppCompatActivity {
     }
 
     private void updateUI(EnvironmentData data){
-        String envTypeText = "Environment: " + data.getEnvironmentType();
+        String envTypeText = "Environment: " + MeebleConstants.envTypeToString(data.getEnvironmentType());
         envTypeView.setText(envTypeText);
-        String cityTypeText = "Type: " + data.getCityType();
+        String cityTypeText = "Type: " + MeebleConstants.cityTypeToString(data.getCityType());
         cityTypeView.setText(cityTypeText);
         String meebleCountText = data.getMeebleCount() + " Meeble(s)";
         meebleCountView.setText(meebleCountText);

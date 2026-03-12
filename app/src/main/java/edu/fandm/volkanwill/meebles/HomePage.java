@@ -142,8 +142,8 @@ public class HomePage extends AppCompatActivity {
     }
 
     public static EnvironmentData generateRandomEnvironment(){
-        char city = '1';
-        char[] envTypes = {'1', '2', '3', '4'};
+        char city = MeebleConstants.VILLAGE;
+        char[] envTypes = {MeebleConstants.ENV_VOLCANO, MeebleConstants.ENV_FOREST, MeebleConstants.ENV_DESERT, MeebleConstants.ENV_TUNDRA};
         char env = envTypes[(int)(Math.random() * envTypes.length)];
         int startingMeebles = 4;
         return new EnvironmentData(startingMeebles, city, env, LocalTime.now());
