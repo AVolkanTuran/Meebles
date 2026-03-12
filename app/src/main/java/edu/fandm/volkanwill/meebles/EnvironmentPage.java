@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -25,7 +26,9 @@ public class EnvironmentPage extends AppCompatActivity {
 
     public static NfcAdapter adapter;
 
-    private static EnvironmentData data;
+    private TextView envTypeView;
+    private TextView cityTypeView;
+    private TextView meebleCountView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,11 @@ public class EnvironmentPage extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
-        data = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
+        envTypeView = (TextView) findViewById(R.id.environment_type);
+        cityTypeView =  (TextView) findViewById(R.id.city_type);
+        meebleCountView  = (TextView) findViewById(R.id.meeble_count);
+
+        EnvironmentData envData = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
 
         adapter = NfcAdapter.getDefaultAdapter(this);
 
@@ -63,6 +70,11 @@ public class EnvironmentPage extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        if(envData != null) {
+            updateUI(envData);
+        }
+
     }
 
     @Override
@@ -77,6 +89,15 @@ public class EnvironmentPage extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
         adapter.disableReaderMode(this);
+    }
+
+    private void updateUI(EnvironmentData data){
+        String envTypeText = "Environment: " + data.getEnvironmentType();
+        envTypeView.setText(envTypeText);
+        String cityTypeText = "Type: " + data.getCityType();
+        cityTypeView.setText(cityTypeText);
+        String meebleCountText = data.getMeebleCount() + " Meeble(s)";
+        meebleCountView.setText(meebleCountText);
     }
 
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
@@ -107,6 +128,11 @@ public class EnvironmentPage extends AppCompatActivity {
 
             try{
                 HomePage.writeToTag(data, tag);
+                runOnUiThread(() -> {
+                    if(data != null) {
+                        updateUI(data);
+                    }
+                });
             } catch (IOException e) {
                 runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
             }

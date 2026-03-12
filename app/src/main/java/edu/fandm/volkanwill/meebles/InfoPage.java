@@ -33,8 +33,7 @@ public class InfoPage extends AppCompatActivity {
         info_close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), EnvironmentPage.class);
-                startActivity(i);
+                finish();
             }
         });
     }
