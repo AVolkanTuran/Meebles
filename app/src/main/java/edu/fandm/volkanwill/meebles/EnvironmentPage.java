@@ -77,7 +77,13 @@ public class EnvironmentPage extends AppCompatActivity {
             Log.d("", "Tag Discovered: " + tag.toString());
             EditText et = (EditText) findViewById(R.id.nfc_number_et);
             int value = Integer.parseInt(et.getText().toString());
-            EnvironmentData data = HomePage.readFromTag(tag);
+            EnvironmentData data;
+            try{
+                data = HomePage.readFromTag(tag);
+            } catch(IOException e){
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Could not read tag. Try again.", Toast.LENGTH_SHORT).show());
+                return;
+            }
 
             MaterialButtonToggleGroup mbtg = (MaterialButtonToggleGroup) findViewById(R.id.withdraw_deposit_toggle);
             int selectedId = mbtg.getCheckedButtonId();

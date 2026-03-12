@@ -90,13 +90,17 @@ public class DeveloperPage extends AppCompatActivity {
                 }
 
             } else if (savedButtonId == R.id.read_button) {
-                EnvironmentData readData = HomePage.readFromTag(tag);
-                if (readData != null) {
-                    runOnUiThread(() -> {
-                        meebleET.setText(String.valueOf(readData.getMeebleCount()));
-                        cityET.setText(String.valueOf(readData.getCityType()));
-                        envET.setText(String.valueOf(readData.getEnvironmentType()));
-                    });
+                try{
+                    EnvironmentData readData = HomePage.readFromTag(tag);
+                    if (readData != null) {
+                        runOnUiThread(() -> {
+                            meebleET.setText(String.valueOf(readData.getMeebleCount()));
+                            cityET.setText(String.valueOf(readData.getCityType()));
+                            envET.setText(String.valueOf(readData.getEnvironmentType()));
+                        });
+                    }
+                } catch(IOException e){
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Could not read tag. Try again.", Toast.LENGTH_SHORT).show());
                 }
             }
         }

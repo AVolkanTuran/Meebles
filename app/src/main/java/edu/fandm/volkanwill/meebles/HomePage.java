@@ -112,12 +112,36 @@ public class HomePage extends AppCompatActivity {
     private class MYNFCCallbackClass implements NfcAdapter.ReaderCallback {
         @Override
         public void onTagDiscovered(Tag tag) {
+            EnvironmentData data;
             Intent i = new Intent(getApplicationContext(), EnvironmentPage.class);
-            startActivity(i);
+            try {
+                data = readFromTag(tag);
+                if(data != null) {
+                    startActivity(i);
+                }
+                if (data == null) {
+                    data = generateRandomEnvironment();
+                    try {
+                        writeToTag(data, tag);
+                        startActivity(i);
+                    } catch (IOException e) {
+                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Could not initialize tag. Try again.", Toast.LENGTH_SHORT).show());
+                    }
+                }
+            } catch (IOException e){
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Could not read tag. Try again.", Toast.LENGTH_SHORT).show());
+            }
         }
 
     }
 
+    public static EnvironmentData generateRandomEnvironment(){
+        char city = '1';
+        char[] envTypes = {'1', '2', '3', '4'};
+        char env = envTypes[(int)(Math.random() * envTypes.length)];
+        int startingMeebles = 4;
+        return new EnvironmentData(startingMeebles, city, env, LocalTime.now());
+    }
     public static void writeToTag(EnvironmentData data, Tag tag) throws IOException {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -180,37 +204,34 @@ public class HomePage extends AppCompatActivity {
         }
     }
 
-    public static EnvironmentData readFromTag(Tag tag) {
-        Ndef ndef = Ndef.get(tag);
-        EnvironmentData data = new EnvironmentData(0,'0','0', LocalTime.now());
-        try {
-            ndef.connect();
-            NdefMessage msg = ndef.getNdefMessage();
-            if (msg != null && msg.getRecords().length > 0) {
-                byte[] payload = msg.getRecords()[0].getPayload();
-                try (ByteArrayInputStream bis = new ByteArrayInputStream(payload);
-                     ObjectInputStream ois = new ObjectInputStream(bis)) {
-                    data = (EnvironmentData) ois.readObject();
-                    return data;
-                }
-                catch (ClassNotFoundException | ClassCastException e) {
-                    Log.e("NFC_READ", "Class mismatch or not found", e);
-                }
-            }
-            else {
-                Log.e("NFC_READ", "Tag is empty.");
-            }
-        } catch (Exception e) {
-            // Handle read error
-            e.printStackTrace();
-        }finally {
+    public static EnvironmentData readFromTag(Tag tag) throws IOException{
+
+        try (Ndef ndef = Ndef.get(tag)) {
             try {
-                ndef.close();
+                ndef.connect();
+                NdefMessage msg = ndef.getNdefMessage();
+                if (msg != null && msg.getRecords().length > 0) {
+                    byte[] payload = msg.getRecords()[0].getPayload();
+                    try (ByteArrayInputStream bis = new ByteArrayInputStream(payload);
+                         ObjectInputStream ois = new ObjectInputStream(bis)) {
+                        return (EnvironmentData) ois.readObject();
+                    } catch (ClassNotFoundException | ClassCastException e) {
+                        Log.e("NFC_READ", "Class mismatch or not found", e);
+                        return null;
+                    }
+                } else {
+                    Log.e("NFC_READ", "Tag is empty.");
+                    return null;
+                }
+            } catch (IOException e) {
+                throw e;
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return data;
+        return null;
     }
 
     private void showIntroDialog(){
