@@ -1,6 +1,9 @@
 package edu.fandm.volkanwill.meebles;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -11,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +46,14 @@ public class HomePage extends AppCompatActivity {
 
         adapter = NfcAdapter.getDefaultAdapter(this);
 
+        //Putting the number of meebles we have in SharedPreferences so that it is shared between activities
+        SharedPreferences prefs = getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+        boolean firstTime = prefs.getBoolean("first_time", true);
+
+        if(firstTime){
+            showIntroDialog();
+        }
+
         Button tutorial_button = findViewById(R.id.tutorial_button);
 
         tutorial_button.setOnClickListener(new View.OnClickListener() {
@@ -52,11 +64,41 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
+        //I don't know what to do with this button
+        //TODO: For Volkan to implement
+        Button readTag = findViewById(R.id.read_tag_button);
+
+        readTag.setOnClickListener(v -> {
+            Toast.makeText(this,"Scan a Meebles city tag!",Toast.LENGTH_SHORT).show();
+        });
+
+        Button map_button = findViewById(R.id.map_button);
+
+        map_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), MuseumMapPage.class);
+                startActivity(i);
+            }
+        });
+
+    }
+
+    public static void saveMeebles(Context context, int count){
+        SharedPreferences prefs = context.getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+        prefs.edit().putInt("meeble_count", count).apply();
+    }
+
+    public static int loadMeebles(Context context){
+        SharedPreferences prefs = context.getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+        return prefs.getInt("meeble_count", 0);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        TextView counter = findViewById(R.id.meebles_counter);
+        counter.setText(String.valueOf(loadMeebles(this)));
         Bundle options = new Bundle();
         MYNFCCallbackClass myCallback = new MYNFCCallbackClass();
         adapter.enableReaderMode(this, myCallback, NfcAdapter.FLAG_READER_NFC_A,options);
@@ -169,5 +211,28 @@ public class HomePage extends AppCompatActivity {
             }
         }
         return data;
+    }
+
+    private void showIntroDialog(){
+
+        new AlertDialog.Builder(this)
+                .setTitle("Welcome!")
+                .setMessage("Do you know what exponential growth is?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+
+                    SharedPreferences prefs = getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+                    prefs.edit().putBoolean("first_time", false).apply();
+
+                    Toast.makeText(this,"Great! Let's start exploring!",Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+
+                    SharedPreferences prefs = getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+                    prefs.edit().putBoolean("first_time", false).apply();
+
+                    Intent i = new Intent(HomePage.this, TutorialPage.class);
+                    startActivity(i);
+                })
+                .show();
     }
 }

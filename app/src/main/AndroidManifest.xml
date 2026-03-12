@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Meebles">
         <activity
+            android:name=".MuseumMapPage"
+            android:exported="false" />
+        <activity
             android:name=".DeveloperPage"
             android:exported="false" />
         <activity

@@ -8,6 +8,87 @@
     android:background="@color/logo_background"
     tools:context=".HomePage">
 
+    <!-- Meebles Counter -->
+    <TextView
+        android:id="@+id/meebles_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Meebles:"
+        android:textSize="28sp"
+        android:textColor="#EDF4C1"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="30dp"/>
+
+    <TextView
+        android:id="@+id/meebles_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="28sp"
+        android:textColor="#EDF4C1"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/meebles_label"
+        app:layout_constraintLeft_toRightOf="@id/meebles_label"
+        android:layout_marginStart="10dp"/>
+
+    <!-- House background shape -->
+    <View
+        android:id="@+id/house_button_bg"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/house_button_background"
+        app:layout_constraintTop_toTopOf="@id/meebles_label"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="30dp"/>
+
+    <!-- House Button (Future Meeble World) -->
+    <ImageButton
+        android:id="@+id/house_button"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_house"
+        android:padding="4dp"
+        android:contentDescription="Meeble House"
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toTopOf="@id/house_button_bg"
+        app:layout_constraintBottom_toBottomOf="@id/house_button_bg"
+        app:layout_constraintLeft_toLeftOf="@id/house_button_bg"
+        app:layout_constraintRight_toRightOf="@id/house_button_bg"/>
+
+    <!-- Read NFC Tag Button -->
+    <Button
+        android:id="@+id/read_tag_button"
+        android:layout_width="0dp"
+        android:layout_height="90dp"
+        android:text="Read Meebles Tag"
+        android:textSize="28sp"
+        android:textColor="#EB5A3D"
+        android:backgroundTint="#EDF4C1"
+        app:layout_constraintTop_toBottomOf="@id/meebles_label"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="80dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"/>
+
+    <!-- Map Button -->
+    <Button
+        android:id="@+id/map_button"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:text="Museum Map"
+        android:textSize="26sp"
+        android:textColor="#EB5A3D"
+        android:backgroundTint="#EDF4C1"
+        app:layout_constraintTop_toBottomOf="@id/read_tag_button"
+        app:layout_constraintLeft_toLeftOf="@id/read_tag_button"
+        app:layout_constraintRight_toRightOf="@id/read_tag_button"
+        android:layout_marginTop="40dp"/>
+
     <Button
         android:id="@+id/tutorial_button"
         android:layout_width="wrap_content"
