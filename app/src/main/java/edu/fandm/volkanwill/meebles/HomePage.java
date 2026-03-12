@@ -44,6 +44,10 @@ public class HomePage extends AppCompatActivity {
             return insets;
         });
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         adapter = NfcAdapter.getDefaultAdapter(this);
 
         //Putting the number of meebles we have in SharedPreferences so that it is shared between activities

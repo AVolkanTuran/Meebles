@@ -29,6 +29,10 @@ public class WelcomePage extends AppCompatActivity {
             return insets;
         });
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         Button b = findViewById(R.id.start_button);
 
         // Normal click -> HomePage

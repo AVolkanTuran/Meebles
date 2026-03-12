@@ -32,6 +32,10 @@ public class DeveloperPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_developer_page);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         adapter = NfcAdapter.getDefaultAdapter(this);
 
         meebleET = findViewById(R.id.meeble_et);

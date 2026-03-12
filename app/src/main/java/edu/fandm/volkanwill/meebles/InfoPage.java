@@ -25,6 +25,10 @@ public class InfoPage extends AppCompatActivity {
             return insets;
         });
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         ImageButton info_close = (ImageButton) findViewById(R.id.info_close_button);
         info_close.setOnClickListener(new View.OnClickListener() {
             @Override

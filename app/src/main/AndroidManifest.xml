@@ -18,24 +18,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Meebles">
         <activity
+            android:screenOrientation="portrait"
             android:name=".MuseumMapPage"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".DeveloperPage"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".InfoPage"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".EnvironmentPage"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".TutorialPage"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".HomePage"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".WelcomePage"
             android:exported="true">
             <intent-filter>

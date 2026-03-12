@@ -36,6 +36,10 @@ public class EnvironmentPage extends AppCompatActivity {
             return insets;
         });
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         adapter = NfcAdapter.getDefaultAdapter(this);
 
         ImageButton go_back = (ImageButton) findViewById(R.id.environment_go_back_button);
