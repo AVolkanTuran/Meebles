@@ -25,6 +25,8 @@ public class EnvironmentPage extends AppCompatActivity {
 
     public static NfcAdapter adapter;
 
+    private static EnvironmentData data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +41,8 @@ public class EnvironmentPage extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        data = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
 
         adapter = NfcAdapter.getDefaultAdapter(this);
 

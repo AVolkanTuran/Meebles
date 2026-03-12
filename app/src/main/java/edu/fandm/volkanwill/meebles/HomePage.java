@@ -121,12 +121,14 @@ public class HomePage extends AppCompatActivity {
             try {
                 data = readFromTag(tag);
                 if(data != null) {
+                    i.putExtra("environment_data", data);
                     startActivity(i);
                 }
                 if (data == null) {
                     data = generateRandomEnvironment();
                     try {
                         writeToTag(data, tag);
+                        i.putExtra("environment_data", data);
                         startActivity(i);
                     } catch (IOException e) {
                         runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Could not initialize tag. Try again.", Toast.LENGTH_SHORT).show());
