@@ -30,6 +30,8 @@ public class EnvironmentPage extends AppCompatActivity {
     private TextView cityTypeView;
     private TextView meebleCountView;
 
+    private EnvironmentData envData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +51,7 @@ public class EnvironmentPage extends AppCompatActivity {
         cityTypeView =  (TextView) findViewById(R.id.city_type);
         meebleCountView  = (TextView) findViewById(R.id.meeble_count);
 
-        EnvironmentData envData = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
+        envData = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
 
         adapter = NfcAdapter.getDefaultAdapter(this);
 
@@ -106,13 +108,7 @@ public class EnvironmentPage extends AppCompatActivity {
             Log.d("", "Tag Discovered: " + tag.toString());
             EditText et = (EditText) findViewById(R.id.nfc_number_et);
             int value = Integer.parseInt(et.getText().toString());
-            EnvironmentData data;
-            try{
-                data = HomePage.readFromTag(tag);
-            } catch(IOException e){
-                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Could not read tag. Try again.", Toast.LENGTH_SHORT).show());
-                return;
-            }
+            EnvironmentData data = new EnvironmentData(envData.getMeebleCount(), envData.getCityType(), envData.getEnvironmentType(), envData.getTime());
 
             MaterialButtonToggleGroup mbtg = (MaterialButtonToggleGroup) findViewById(R.id.withdraw_deposit_toggle);
             int selectedId = mbtg.getCheckedButtonId();
@@ -128,11 +124,8 @@ public class EnvironmentPage extends AppCompatActivity {
 
             try{
                 HomePage.writeToTag(data, tag);
-                runOnUiThread(() -> {
-                    if(data != null) {
-                        updateUI(data);
-                    }
-                });
+                envData = data;
+                runOnUiThread(() -> updateUI(data));
             } catch (IOException e) {
                 runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
             }
