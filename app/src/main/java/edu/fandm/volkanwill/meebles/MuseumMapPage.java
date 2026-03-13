@@ -22,6 +22,10 @@ public class MuseumMapPage extends AppCompatActivity {
         CircleIndicator3 indicator = findViewById(R.id.tutorial_dots);
         indicator.setViewPager(pager); // links the indicator to your ViewPager2
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         ImageButton exit = findViewById(R.id.exit_button);
         exit.setOnClickListener(v -> {
             finish();
