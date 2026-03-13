@@ -37,9 +37,9 @@
         android:backgroundTint="#EDF4C1"
         android:scaleType="centerInside"
         android:padding="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="575dp"
+        android:layout_marginTop="60dp"
         android:layout_marginEnd="30dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
