@@ -254,7 +254,7 @@ public class HomePage extends AppCompatActivity {
 
     //Timescale is minutes. Doubles every minute given a rate of 1.
     public static int exponentialGrowth(int p0, double rate, long time){
-        return (int) (p0*Math.pow(2, rate * (int) (time/6000.0)));
+        return (int) (p0*Math.pow(2, rate * (int) (time/60000.0)));
     }
 
     public static EnvironmentData growMeebles(EnvironmentData data){
