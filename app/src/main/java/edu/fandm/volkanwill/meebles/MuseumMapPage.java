@@ -1,28 +1,30 @@
 package edu.fandm.volkanwill.meebles;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.viewpager2.widget.ViewPager2;
+
+import me.relex.circleindicator.CircleIndicator3;
 
 public class MuseumMapPage extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_museum_map_page);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        ViewPager2 pager = findViewById(R.id.map_pager);
+        MapAdapter adapter = new MapAdapter();
+        pager.setAdapter(adapter);
+
+        CircleIndicator3 indicator = findViewById(R.id.tutorial_dots);
+        indicator.setViewPager(pager); // links the indicator to your ViewPager2
+
+        ImageButton exit = findViewById(R.id.exit_button);
+        exit.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

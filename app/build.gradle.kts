@@ -48,4 +48,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("com.google.android.material:material:1.11.0")
     implementation("me.relex:circleindicator:2.1.6")
+    implementation("com.davemorrissey.labs:subsampling-scale-image-view:3.10.0")
 }

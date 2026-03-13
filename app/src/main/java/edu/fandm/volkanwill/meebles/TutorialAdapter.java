@@ -20,9 +20,9 @@ public class TutorialAdapter extends RecyclerView.Adapter<TutorialAdapter.ViewHo
     String[] texts = {
             "Meebles are tiny creatures that live in cities around the museum!",
             "1 becomes 2\n2 becomes 4\n4 becomes 8\n\nThis is exponential growth!",
-            "Look around the museum for paper cities. Each city has a secret NFC tag!",
+            "Look around the museum for paper cities. Each city has a special white Meebles tag!",
             "Use the Read Meebles Tag button to scan a city and see how many live there.",
-            "You can move Meebles between cities and watch how the population changes!"
+            "You can move Meebles between cities and watch how the population grows!"
     };
 
     @Override
