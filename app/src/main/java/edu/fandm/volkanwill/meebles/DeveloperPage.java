@@ -86,7 +86,7 @@ public class DeveloperPage extends AppCompatActivity {
         @Override
         public void onTagDiscovered(Tag tag) {
             if (savedButtonId == R.id.write_button) {
-                EnvironmentData data = new EnvironmentData(savedMeebleCount, savedCityType, savedEnvType, LocalTime.now());
+                EnvironmentData data = new EnvironmentData(savedMeebleCount, savedCityType, savedEnvType, System.currentTimeMillis());
                 try{
                     HomePage.writeToTag(data, tag);}
                 catch (IOException e) {

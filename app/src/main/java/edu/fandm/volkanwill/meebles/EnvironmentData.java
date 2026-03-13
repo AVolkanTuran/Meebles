@@ -1,16 +1,15 @@
 package edu.fandm.volkanwill.meebles;
 
 import java.io.Serializable;
-import java.time.LocalTime;
 
 public class EnvironmentData implements Serializable {
 
     private int meebleCount;
     private char cityType;
     private char environmentType;
-    private LocalTime time;
+    private long time;
 
-    public EnvironmentData(int meebleCount, char cityType, char environmentType, LocalTime time){
+    public EnvironmentData(int meebleCount, char cityType, char environmentType, long time){
         this.meebleCount = meebleCount;
         this.cityType = cityType;
         this.environmentType = environmentType;
@@ -29,7 +28,7 @@ public class EnvironmentData implements Serializable {
         return environmentType;
     }
 
-    public LocalTime getTime(){
+    public long getTime(){
         return time;
     }
 
@@ -37,14 +36,14 @@ public class EnvironmentData implements Serializable {
         this.meebleCount = meebleCount;
     }
 
-    public void setCityType(char CityType){
+    public void setCityType(char cityType){
         this.cityType=cityType;
     }
 
     public void setEnvironmentType(char environmentType){
         this.environmentType=environmentType;
     }
-    public void setTime(LocalTime time){
+    public void setTime(long time){
         this.time = time;
     }
 }

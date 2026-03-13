@@ -26,9 +26,9 @@ import androidx.core.view.WindowInsetsCompat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.time.LocalTime;
 
 public class HomePage extends AppCompatActivity {
 
@@ -121,7 +121,8 @@ public class HomePage extends AppCompatActivity {
             try {
                 data = readFromTag(tag);
                 if(data != null) {
-                    i.putExtra("environment_data", data);
+                    EnvironmentData updatedData = growMeebles(data);
+                    i.putExtra("environment_data", updatedData);
                     startActivity(i);
                 }
                 if (data == null) {
@@ -146,7 +147,7 @@ public class HomePage extends AppCompatActivity {
         char[] envTypes = {MeebleConstants.ENV_VOLCANO, MeebleConstants.ENV_FOREST, MeebleConstants.ENV_DESERT, MeebleConstants.ENV_TUNDRA};
         char env = envTypes[(int)(Math.random() * envTypes.length)];
         int startingMeebles = 4;
-        return new EnvironmentData(startingMeebles, city, env, LocalTime.now());
+        return new EnvironmentData(startingMeebles, city, env, System.currentTimeMillis());
     }
     public static void writeToTag(EnvironmentData data, Tag tag) throws IOException {
         try {
@@ -229,7 +230,7 @@ public class HomePage extends AppCompatActivity {
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(payload);
                          ObjectInputStream ois = new ObjectInputStream(bis)) {
                         return (EnvironmentData) ois.readObject();
-                    } catch (ClassNotFoundException | ClassCastException e) {
+                    } catch (ClassNotFoundException | ClassCastException | InvalidClassException e) {
                         Log.e("NFC_READ", "Class mismatch or not found", e);
                         return null;
                     }
@@ -249,6 +250,57 @@ public class HomePage extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    //Timescale is minutes. Doubles every minute given a rate of 1.
+    public static int exponentialGrowth(int p0, double rate, long time){
+        return (int) (p0*Math.pow(2, rate * (int) (time/6000.0)));
+    }
+
+    public static EnvironmentData growMeebles(EnvironmentData data){
+        if(data == null){
+            return null;
+        }
+
+        long timeElapsed = System.currentTimeMillis()-data.getTime();
+
+        double rate;
+        switch (data.getEnvironmentType()){
+            case MeebleConstants.ENV_VOLCANO:
+                rate = 0.5;
+                break;
+            case MeebleConstants.ENV_FOREST:
+                rate = 2;
+                break;
+            case MeebleConstants.ENV_DESERT:
+                rate = 0.8;
+                break;
+            case MeebleConstants.ENV_TUNDRA:
+                rate = 1.2;
+                break;
+            default:
+                rate = 1;
+        }
+
+        int meebleCount = exponentialGrowth(data.getMeebleCount(), rate, timeElapsed);
+        if(meebleCount > 4000000){
+            meebleCount = 4000000;
+        }
+
+        if(meebleCount < 0){
+            meebleCount = 4;
+        }
+
+        char cityType = '1';
+
+        if(meebleCount > 500000){
+            cityType = '3';
+        }
+        else if(meebleCount > 20000){
+            cityType = '2';
+        }
+
+        return new EnvironmentData(meebleCount, cityType, data.getEnvironmentType(), System.currentTimeMillis());
     }
 
     private void showIntroDialog(){

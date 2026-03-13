@@ -20,7 +20,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.io.IOException;
-import java.time.LocalTime;
 
 public class EnvironmentPage extends AppCompatActivity {
 
@@ -108,18 +107,32 @@ public class EnvironmentPage extends AppCompatActivity {
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
         @Override
         public void onTagDiscovered(Tag tag){
+            EnvironmentData updatedData = HomePage.growMeebles(envData);
+
             boolean success = false;
             Log.d("", "Tag Discovered: " + tag.toString());
             EditText et = (EditText) findViewById(R.id.nfc_number_et);
-            int value = Integer.parseInt(et.getText().toString());
-            EnvironmentData data = new EnvironmentData(envData.getMeebleCount(), envData.getCityType(), envData.getEnvironmentType(), envData.getTime());
+            String input = et.getText().toString().trim();
+            if(input.isEmpty()) {
+                try{
+                    HomePage.writeToTag(updatedData, tag);
+                    envData = updatedData;
+                    runOnUiThread(() -> updateUI(envData));
+                } catch(IOException e){
+                    runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
+                }
+                return;
+            }
+
+            int value = Integer.parseInt(input);
+            EnvironmentData data = new EnvironmentData(updatedData.getMeebleCount(), updatedData.getCityType(), updatedData.getEnvironmentType(), envData.getTime());
 
             MaterialButtonToggleGroup mbtg = (MaterialButtonToggleGroup) findViewById(R.id.withdraw_deposit_toggle);
             int selectedId = mbtg.getCheckedButtonId();
             if(selectedId == R.id.withdraw){
                 if((data.getMeebleCount() - value) >= 2 && currentMeebles + value > 0){
                     data.setMeebleCount(data.getMeebleCount() - value);
-                    data.setTime(LocalTime.now());
+                    data.setTime(System.currentTimeMillis());
                     success = true;
                 }
                 else if ((data.getMeebleCount() - value) < 2) {
@@ -131,7 +144,7 @@ public class EnvironmentPage extends AppCompatActivity {
             } else if(selectedId == R.id.deposit){
                 if(currentMeebles >= value && data.getMeebleCount() + value <= 4000000){
                     data.setMeebleCount(data.getMeebleCount()+value);
-                    data.setTime(LocalTime.now());
+                    data.setTime(System.currentTimeMillis());
                     success = true;
                 }
                 else if(currentMeebles < value) {
@@ -142,19 +155,24 @@ public class EnvironmentPage extends AppCompatActivity {
                 }
             }
 
-            if(!success){
-                return;
-            }
-
             try{
-                HomePage.writeToTag(data, tag);
-                envData = data;
-                runOnUiThread(() -> updateUI(data));
-                if(selectedId == R.id.withdraw){
-                    HomePage.saveMeebles(getApplicationContext(), currentMeebles+value);
+                if(success){
+                    HomePage.writeToTag(data, tag);
+                    envData = data;
+                    runOnUiThread(() -> updateUI(data));
+                    if(selectedId == R.id.withdraw){
+                        HomePage.saveMeebles(getApplicationContext(), currentMeebles+value);
+                        currentMeebles = currentMeebles + value;
+                    }
+                    else if(selectedId == R.id.deposit){
+                        HomePage.saveMeebles(getApplicationContext(), currentMeebles-value);
+                        currentMeebles = currentMeebles - value;
+                    }
                 }
-                else if(selectedId == R.id.deposit){
-                    HomePage.saveMeebles(getApplicationContext(), currentMeebles-value);
+                else {
+                    HomePage.writeToTag(updatedData, tag);
+                    envData = updatedData;
+                    runOnUiThread(() -> updateUI(envData));
                 }
             } catch (IOException e) {
                 runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
