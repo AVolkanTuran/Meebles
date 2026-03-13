@@ -176,6 +176,7 @@ public class HomePage extends AppCompatActivity {
 
     public static void formatAndWriteToTag(Tag tag, NdefMessage message) throws IOException {
         Ndef ndef = Ndef.get(tag);
+        NdefFormatable formattable = null;
 
         try {
             if (ndef != null) {
@@ -188,7 +189,7 @@ public class HomePage extends AppCompatActivity {
                 }
                 ndef.writeNdefMessage(message);
             } else {
-                NdefFormatable formattable = NdefFormatable.get(tag);
+                formattable = NdefFormatable.get(tag);
                 if (formattable != null) {
                     formattable.connect();
                     formattable.format(message);
@@ -203,6 +204,13 @@ public class HomePage extends AppCompatActivity {
             try {
                 if(ndef!=null){
                     ndef.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if (formattable != null) {
+                    formattable.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -234,7 +242,10 @@ public class HomePage extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw e;
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         return null;

@@ -32,6 +32,8 @@ public class EnvironmentPage extends AppCompatActivity {
 
     private EnvironmentData envData;
 
+    private int currentMeebles;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +49,7 @@ public class EnvironmentPage extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
+        currentMeebles = HomePage.loadMeebles(getApplicationContext());
         envTypeView = (TextView) findViewById(R.id.environment_type);
         cityTypeView =  (TextView) findViewById(R.id.city_type);
         meebleCountView  = (TextView) findViewById(R.id.meeble_count);
@@ -105,6 +108,7 @@ public class EnvironmentPage extends AppCompatActivity {
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
         @Override
         public void onTagDiscovered(Tag tag){
+            boolean success = false;
             Log.d("", "Tag Discovered: " + tag.toString());
             EditText et = (EditText) findViewById(R.id.nfc_number_et);
             int value = Integer.parseInt(et.getText().toString());
@@ -113,19 +117,45 @@ public class EnvironmentPage extends AppCompatActivity {
             MaterialButtonToggleGroup mbtg = (MaterialButtonToggleGroup) findViewById(R.id.withdraw_deposit_toggle);
             int selectedId = mbtg.getCheckedButtonId();
             if(selectedId == R.id.withdraw){
-                if(value < data.getMeebleCount()) {
+                if((data.getMeebleCount() - value) >= 2 && currentMeebles + value > 0){
                     data.setMeebleCount(data.getMeebleCount() - value);
                     data.setTime(LocalTime.now());
+                    success = true;
+                }
+                else if ((data.getMeebleCount() - value) < 2) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "There needs to be at least 2 Meebles in a city!", Toast.LENGTH_LONG).show());
+                }
+                else if(data.getMeebleCount() + value > 4000000){
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You reached the maximum number of Meebles in a city.", Toast.LENGTH_LONG).show());
                 }
             } else if(selectedId == R.id.deposit){
-                data.setMeebleCount(data.getMeebleCount()+value);
-                data.setTime(LocalTime.now());
+                if(currentMeebles >= value && data.getMeebleCount() + value <= 4000000){
+                    data.setMeebleCount(data.getMeebleCount()+value);
+                    data.setTime(LocalTime.now());
+                    success = true;
+                }
+                else if(currentMeebles < value) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You don't have enough Meebles.", Toast.LENGTH_LONG).show());
+                }
+                else if(currentMeebles + value > 0){
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You reached the maximum number of Meebles on your device.", Toast.LENGTH_LONG).show());
+                }
+            }
+
+            if(!success){
+                return;
             }
 
             try{
                 HomePage.writeToTag(data, tag);
                 envData = data;
                 runOnUiThread(() -> updateUI(data));
+                if(selectedId == R.id.withdraw){
+                    HomePage.saveMeebles(getApplicationContext(), currentMeebles+value);
+                }
+                else if(selectedId == R.id.deposit){
+                    HomePage.saveMeebles(getApplicationContext(), currentMeebles-value);
+                }
             } catch (IOException e) {
                 runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
             }
