@@ -254,7 +254,7 @@ public class HomePage extends AppCompatActivity {
 
     //Timescale is minutes. Doubles every minute given a rate of 1.
     public static int exponentialGrowth(int p0, double rate, long time){
-        return (int) (p0*Math.pow(2, rate * (int) (time/60000.0)));
+        return (int) (p0*Math.pow(2, rate * (time/60000.0)));
     }
 
     public static EnvironmentData growMeebles(EnvironmentData data){
@@ -273,10 +273,10 @@ public class HomePage extends AppCompatActivity {
                 rate = 2;
                 break;
             case MeebleConstants.ENV_DESERT:
-                rate = 0.8;
+                rate = 1;
                 break;
             case MeebleConstants.ENV_TUNDRA:
-                rate = 1.2;
+                rate = 1.5;
                 break;
             default:
                 rate = 1;
@@ -300,7 +300,11 @@ public class HomePage extends AppCompatActivity {
             cityType = '2';
         }
 
-        return new EnvironmentData(meebleCount, cityType, data.getEnvironmentType(), System.currentTimeMillis());
+        long newTime;
+        if (meebleCount != data.getMeebleCount()){
+            newTime = System.currentTimeMillis();
+        } else{ newTime = data.getTime();}
+        return new EnvironmentData(meebleCount, cityType, data.getEnvironmentType(), newTime);
     }
 
     private void showIntroDialog(){

@@ -25,6 +25,8 @@ public class EnvironmentPage extends AppCompatActivity {
 
     public static NfcAdapter adapter;
 
+    private volatile boolean isProcessing = false;
+
     private TextView envTypeView;
     private TextView cityTypeView;
     private TextView meebleCountView;
@@ -61,8 +63,10 @@ public class EnvironmentPage extends AppCompatActivity {
         go_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), HomePage.class);
-                startActivity(i);
+                if(!isProcessing){
+                    Intent i = new Intent(getApplicationContext(), HomePage.class);
+                    startActivity(i);
+                }
             }
         });
 
@@ -70,8 +74,10 @@ public class EnvironmentPage extends AppCompatActivity {
         info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), InfoPage.class);
-                startActivity(i);
+                if(!isProcessing){
+                    Intent i = new Intent(getApplicationContext(), InfoPage.class);
+                    startActivity(i);
+                }
             }
         });
 
@@ -107,6 +113,9 @@ public class EnvironmentPage extends AppCompatActivity {
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
         @Override
         public void onTagDiscovered(Tag tag){
+            if (isProcessing) return;
+            isProcessing = true;
+
             EnvironmentData updatedData = HomePage.growMeebles(envData);
 
             boolean success = false;
@@ -120,6 +129,8 @@ public class EnvironmentPage extends AppCompatActivity {
                     runOnUiThread(() -> updateUI(envData));
                 } catch(IOException e){
                     runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
+                } finally {
+                    isProcessing = false;
                 }
                 return;
             }
@@ -169,13 +180,16 @@ public class EnvironmentPage extends AppCompatActivity {
                         currentMeebles = currentMeebles - value;
                     }
                 }
-                else {
+                else{
                     HomePage.writeToTag(updatedData, tag);
                     envData = updatedData;
                     runOnUiThread(() -> updateUI(envData));
                 }
             } catch (IOException e) {
                 runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
+            }
+            finally{
+                isProcessing = false;
             }
         }
     }
