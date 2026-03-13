@@ -39,7 +39,7 @@
         android:padding="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="550dp"
+        android:layout_marginBottom="575dp"
         android:layout_marginEnd="30dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
