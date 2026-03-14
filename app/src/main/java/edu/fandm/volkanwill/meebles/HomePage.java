@@ -318,7 +318,41 @@ public class HomePage extends AppCompatActivity {
             return null;
         }
 
-        long timeElapsed = System.currentTimeMillis()-data.getTime();
+        //reset at noon and midnight
+        long now = System.currentTimeMillis();
+        long lastTime = data.getTime();
+
+        java.util.Calendar last = java.util.Calendar.getInstance();
+        last.setTimeInMillis(lastTime);
+
+        java.util.Calendar current = java.util.Calendar.getInstance();
+        current.setTimeInMillis(now);
+
+        java.util.Calendar midnight = (java.util.Calendar) current.clone();
+        midnight.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        midnight.set(java.util.Calendar.MINUTE, 0);
+        midnight.set(java.util.Calendar.SECOND, 0);
+        midnight.set(java.util.Calendar.MILLISECOND, 0);
+
+        java.util.Calendar noon = (java.util.Calendar) current.clone();
+        noon.set(java.util.Calendar.HOUR_OF_DAY, 12);
+        noon.set(java.util.Calendar.MINUTE, 0);
+        noon.set(java.util.Calendar.SECOND, 0);
+        noon.set(java.util.Calendar.MILLISECOND, 0);
+
+        boolean resetHappened = (lastTime < midnight.getTimeInMillis() && now >= midnight.getTimeInMillis())
+                || (lastTime < noon.getTimeInMillis() && now >= noon.getTimeInMillis());
+
+        if(resetHappened){
+            data.setMeebleCount(4);
+            if (now >= noon.getTimeInMillis() && lastTime < noon.getTimeInMillis()) {
+                data.setTime(noon.getTimeInMillis());
+            } else {
+                data.setTime(midnight.getTimeInMillis());
+            }
+        }
+
+        long timeElapsed = now-data.getTime();
 
         double rate;
         switch (data.getEnvironmentType()){
