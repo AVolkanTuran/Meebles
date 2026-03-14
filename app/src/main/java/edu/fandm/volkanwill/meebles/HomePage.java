@@ -139,7 +139,15 @@ public class HomePage extends AppCompatActivity {
 
         meebleContainer.removeAllViews();
 
-        int visibleMeebles = Math.min(50, (int)(Math.log10(totalCount + 1) * 12));
+        int func;
+        if(totalCount <= 14){
+            func = totalCount;
+        }
+        else{
+            func = (int) (Math.log10(totalCount + 1) * 12);
+        }
+
+        int visibleMeebles = Math.min(50, func);
 
         // Compute percentage of each type
         float percVolcano = totalCount > 0 ? (float) meeblesVolcano / totalCount : 0.25f;
