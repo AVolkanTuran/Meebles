@@ -77,11 +77,11 @@ public class InfoPage extends AppCompatActivity {
                 break;
 
             case MeebleConstants.ENV_DESERT:
-                biomeMessage = "• No heat and water means less fun for the meebles.";
+                biomeMessage = "• High heat and no water means less fun for the meebles.";
                 break;
 
             case MeebleConstants.ENV_VOLCANO:
-                biomeMessage = "• Is it just me or is it really hot in there?";
+                biomeMessage = "• Is it just me or is it really really scorching in here?";
                 break;
         }
 
