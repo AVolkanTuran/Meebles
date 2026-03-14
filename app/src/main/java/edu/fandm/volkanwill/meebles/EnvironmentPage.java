@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -36,6 +37,7 @@ public class EnvironmentPage extends AppCompatActivity {
 
     private EnvironmentData envData;
 
+    private long openedAt;
     private int currentMeebles;
 
     FrameLayout meebleContainer;
@@ -47,6 +49,7 @@ public class EnvironmentPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        openedAt = System.currentTimeMillis();
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_environment_page);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -57,6 +60,21 @@ public class EnvironmentPage extends AppCompatActivity {
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
+        }
+
+        if(getIntent().getBooleanExtra("new_env", false)){
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setMessage("New Meebles moved in and built a new village!")
+                    .create();
+            dialog.show();
+
+            new android.os.Handler(getMainLooper()).postDelayed(() -> {
+                dialog.dismiss();
+                // re-enable scanning after dialog closes
+                Bundle options = new Bundle();
+                MYNFCCallBackClass myCallback = new MYNFCCallBackClass();
+                adapter.enableReaderMode(this, myCallback, NfcAdapter.FLAG_READER_NFC_A, options);
+            }, 3000);
         }
 
         meebleContainer = findViewById(R.id.meebles_container);
@@ -118,6 +136,8 @@ public class EnvironmentPage extends AppCompatActivity {
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
         @Override
         public void onTagDiscovered(Tag tag){
+            if (System.currentTimeMillis() - openedAt < 1500) return;
+
             if (isProcessing) return;
             isProcessing = true;
 

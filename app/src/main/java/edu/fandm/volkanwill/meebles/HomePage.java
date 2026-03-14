@@ -177,6 +177,7 @@ public class HomePage extends AppCompatActivity {
                 if(data != null) {
                     EnvironmentData updatedData = growMeebles(data);
                     i.putExtra("environment_data", updatedData);
+                    i.putExtra("new_env", false);
                     startActivity(i);
                 }
                 if (data == null) {
@@ -184,6 +185,7 @@ public class HomePage extends AppCompatActivity {
                     try {
                         writeToTag(data, tag);
                         i.putExtra("environment_data", data);
+                        i.putExtra("new_env", true);
                         startActivity(i);
                     } catch (IOException e) {
                         runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Could not initialize tag. Try again.", Toast.LENGTH_SHORT).show());
