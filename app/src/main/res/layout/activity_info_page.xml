@@ -22,22 +22,28 @@
 
     <TextView
         android:id="@+id/info_text"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="70dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:text="Info"
+        android:textSize="20sp"
+        android:textColor="#EDF4C1"
+        android:textStyle="bold"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginTop="100dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/population_plot"/>
 
-    <ImageView
-        android:id="@+id/info_image"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
+    <edu.fandm.volkanwill.meebles.PopulationPlotView
+        android:id="@+id/population_plot"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
         android:layout_margin="25dp"
-        android:adjustViewBounds="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:src="@drawable/placeholder_exponential"/>
+        app:layout_constraintRight_toRightOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
