@@ -38,6 +38,7 @@ public class EnvironmentPage extends AppCompatActivity {
     private EnvironmentData envData;
 
     private long openedAt;
+    private AlertDialog writingDialog;
     private int currentMeebles;
 
     FrameLayout meebleContainer;
@@ -148,6 +149,7 @@ public class EnvironmentPage extends AppCompatActivity {
             EditText et = (EditText) findViewById(R.id.nfc_number_et);
             String input = et.getText().toString().trim();
             if(input.isEmpty()) {
+                showWritingDialog();
                 try{
                     HomePage.writeToTag(updatedData, tag);
                     envData = updatedData;
@@ -155,6 +157,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 } catch(IOException e){
                     runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
                 } finally {
+                    dismissWritingDialog();
                     isProcessing = false;
                 }
                 return;
@@ -214,6 +217,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 }
             }
 
+            showWritingDialog();
             try{
                 if(success){
                     HomePage.writeToTag(data, tag);
@@ -251,6 +255,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
             }
             finally{
+                dismissWritingDialog();
                 isProcessing = false;
             }
         }
@@ -342,5 +347,23 @@ public class EnvironmentPage extends AppCompatActivity {
         animator.setRepeatCount(ObjectAnimator.INFINITE);
         animator.setRepeatMode(ObjectAnimator.REVERSE);
         animator.start();
+    }
+
+    private void showWritingDialog() {
+        runOnUiThread(() -> {
+            writingDialog = new AlertDialog.Builder(this)
+                    .setMessage("Processing... Hold your phone still...")
+                    .setCancelable(false)
+                    .create();
+            writingDialog.show();
+        });
+    }
+
+    private void dismissWritingDialog() {
+        runOnUiThread(() -> {
+            if (writingDialog != null && writingDialog.isShowing()) {
+                writingDialog.dismiss();
+            }
+        });
     }
 }
