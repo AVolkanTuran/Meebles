@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -36,6 +37,8 @@ public class EnvironmentPage extends AppCompatActivity {
 
     private EnvironmentData envData;
 
+    private long openedAt;
+    private AlertDialog writingDialog;
     private int currentMeebles;
 
     FrameLayout meebleContainer;
@@ -47,6 +50,7 @@ public class EnvironmentPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        openedAt = System.currentTimeMillis();
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_environment_page);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -57,6 +61,21 @@ public class EnvironmentPage extends AppCompatActivity {
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
+        }
+
+        if(getIntent().getBooleanExtra("new_env", false)){
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setMessage("New Meebles moved in and built a new village!")
+                    .create();
+            dialog.show();
+
+            new android.os.Handler(getMainLooper()).postDelayed(() -> {
+                dialog.dismiss();
+                // re-enable scanning after dialog closes
+                Bundle options = new Bundle();
+                MYNFCCallBackClass myCallback = new MYNFCCallBackClass();
+                adapter.enableReaderMode(this, myCallback, NfcAdapter.FLAG_READER_NFC_A, options);
+            }, 3000);
         }
 
         meebleContainer = findViewById(R.id.meebles_container);
@@ -145,6 +164,8 @@ public class EnvironmentPage extends AppCompatActivity {
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
         @Override
         public void onTagDiscovered(Tag tag){
+            if (System.currentTimeMillis() - openedAt < 1500) return;
+
             if (isProcessing) return;
             isProcessing = true;
 
@@ -155,6 +176,7 @@ public class EnvironmentPage extends AppCompatActivity {
             EditText et = (EditText) findViewById(R.id.nfc_number_et);
             String input = et.getText().toString().trim();
             if(input.isEmpty()) {
+                showWritingDialog();
                 try{
                     HomePage.writeToTag(updatedData, tag);
                     envData = updatedData;
@@ -162,6 +184,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 } catch(IOException e){
                     runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
                 } finally {
+                    dismissWritingDialog();
                     isProcessing = false;
                 }
                 return;
@@ -221,6 +244,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 }
             }
 
+            showWritingDialog();
             try{
                 if(success){
                     HomePage.writeToTag(data, tag);
@@ -258,6 +282,7 @@ public class EnvironmentPage extends AppCompatActivity {
                 runOnUiThread(() -> {Toast.makeText(getApplicationContext(), "Could not write to NFC. Try again.", Toast.LENGTH_SHORT).show();});
             }
             finally{
+                dismissWritingDialog();
                 isProcessing = false;
             }
         }
@@ -349,5 +374,23 @@ public class EnvironmentPage extends AppCompatActivity {
         animator.setRepeatCount(ObjectAnimator.INFINITE);
         animator.setRepeatMode(ObjectAnimator.REVERSE);
         animator.start();
+    }
+
+    private void showWritingDialog() {
+        runOnUiThread(() -> {
+            writingDialog = new AlertDialog.Builder(this)
+                    .setMessage("Processing... Hold your phone still...")
+                    .setCancelable(false)
+                    .create();
+            writingDialog.show();
+        });
+    }
+
+    private void dismissWritingDialog() {
+        runOnUiThread(() -> {
+            if (writingDialog != null && writingDialog.isShowing()) {
+                writingDialog.dismiss();
+            }
+        });
     }
 }
