@@ -39,6 +39,10 @@ public class EnvironmentPage extends AppCompatActivity {
     private int currentMeebles;
 
     FrameLayout meebleContainer;
+    private int meeblesVolcano;
+    private int meeblesForest;
+    private int meeblesDesert;
+    private int meeblesTundra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,11 @@ public class EnvironmentPage extends AppCompatActivity {
         meebleContainer = findViewById(R.id.meebles_container);
 
         currentMeebles = HomePage.loadMeebles(getApplicationContext());
+        int[] counts = HomePage.loadMeeblesData(getApplicationContext());
+        meeblesVolcano = counts[0];
+        meeblesForest  = counts[1];
+        meeblesDesert  = counts[2];
+        meeblesTundra  = counts[3];
         meebleCountView  = (TextView) findViewById(R.id.meeble_count);
 
         envData = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
@@ -141,6 +150,14 @@ public class EnvironmentPage extends AppCompatActivity {
                     data.setMeebleCount(data.getMeebleCount() - value);
                     data.setTime(System.currentTimeMillis());
                     success = true;
+
+                    // Increment the environment-specific meebles on the device
+                    switch(envData.getEnvironmentType()){
+                        case MeebleConstants.ENV_VOLCANO: meeblesVolcano += value; break;
+                        case MeebleConstants.ENV_FOREST:  meeblesForest  += value; break;
+                        case MeebleConstants.ENV_DESERT:  meeblesDesert  += value; break;
+                        case MeebleConstants.ENV_TUNDRA:  meeblesTundra  += value; break;
+                    }
                 }
                 else if ((data.getMeebleCount() - value) < 2) {
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "There needs to be at least 2 Meebles in a city!", Toast.LENGTH_LONG).show());
@@ -153,6 +170,21 @@ public class EnvironmentPage extends AppCompatActivity {
                     data.setMeebleCount(data.getMeebleCount()+value);
                     data.setTime(System.currentTimeMillis());
                     success = true;
+
+                    // Split the dropped meebles proportionally
+                    float total = meeblesVolcano + meeblesForest + meeblesDesert + meeblesTundra;
+                    if(total == 0) total = 1; // avoid divide by zero
+
+                    meeblesVolcano -= Math.round(value * meeblesVolcano / total);
+                    meeblesForest  -= Math.round(value * meeblesForest  / total);
+                    meeblesDesert  -= Math.round(value * meeblesDesert  / total);
+                    meeblesTundra  -= Math.round(value * meeblesTundra  / total);
+
+                    // make sure none go negative
+                    meeblesVolcano = Math.max(meeblesVolcano, 0);
+                    meeblesForest  = Math.max(meeblesForest, 0);
+                    meeblesDesert  = Math.max(meeblesDesert, 0);
+                    meeblesTundra  = Math.max(meeblesTundra, 0);
                 }
                 else if(currentMeebles < value) {
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You don't have enough Meebles.", Toast.LENGTH_LONG).show());
@@ -168,12 +200,26 @@ public class EnvironmentPage extends AppCompatActivity {
                     envData = data;
                     runOnUiThread(() -> updateUI(data));
                     if(selectedId == R.id.withdraw){
-                        HomePage.saveMeebles(getApplicationContext(), currentMeebles+value);
-                        currentMeebles = currentMeebles + value;
+                        // Save total and per-environment counts
+                        HomePage.saveMeeblesData(getApplicationContext(),
+                                meeblesVolcano,
+                                meeblesForest,
+                                meeblesDesert,
+                                meeblesTundra);
+                        // Update currentMeebles for display
+                        currentMeebles = meeblesVolcano + meeblesForest + meeblesDesert + meeblesTundra;
+                        HomePage.saveMeebles(getApplicationContext(), currentMeebles);
                     }
                     else if(selectedId == R.id.deposit){
-                        HomePage.saveMeebles(getApplicationContext(), currentMeebles-value);
-                        currentMeebles = currentMeebles - value;
+                        HomePage.saveMeeblesData(getApplicationContext(),
+                                meeblesVolcano,
+                                meeblesForest,
+                                meeblesDesert,
+                                meeblesTundra);
+
+                        // Update total device meebles
+                        currentMeebles = meeblesVolcano + meeblesForest + meeblesDesert + meeblesTundra;
+                        HomePage.saveMeebles(getApplicationContext(), currentMeebles);
                     }
                 }
                 else{

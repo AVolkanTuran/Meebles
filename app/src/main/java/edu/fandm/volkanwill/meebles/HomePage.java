@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Map;
-
 import android.animation.ObjectAnimator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -39,6 +37,12 @@ public class HomePage extends AppCompatActivity {
 
     public static NfcAdapter adapter; //Removed the public static so that we can't scan in other pages
     FrameLayout meebleContainer;
+
+    // Counts for each environment type
+    private int meeblesVolcano = 0;
+    private int meeblesForest  = 0;
+    private int meeblesDesert  = 0;
+    private int meeblesTundra  = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,11 +120,37 @@ public class HomePage extends AppCompatActivity {
 
         meebleContainer.removeAllViews();
 
-        int visibleMeebles = Math.min(50, (int)Math.log10(count + 1) * 12); //Make the meebles appear in density instead of their actual numbers
+        // Load environment-specific meebles
+        int[] counts = loadMeeblesData(this);
+        meeblesVolcano = counts[0];
+        meeblesForest  = counts[1];
+        meeblesDesert  = counts[2];
+        meeblesTundra  = counts[3];
 
-        for(int i = 0; i < visibleMeebles; i++){
-            addRandomMeeble();
-        }
+        int totalCount = meeblesVolcano + meeblesForest + meeblesDesert + meeblesTundra;
+        counter.setText(String.valueOf(totalCount));
+
+        meebleContainer.removeAllViews();
+
+        int visibleMeebles = Math.min(50, (int)(Math.log10(totalCount + 1) * 12));
+
+        // Compute percentage of each type
+        float percVolcano = totalCount > 0 ? (float) meeblesVolcano / totalCount : 0.25f;
+        float percForest  = totalCount > 0 ? (float) meeblesForest / totalCount : 0.25f;
+        float percDesert  = totalCount > 0 ? (float) meeblesDesert / totalCount : 0.25f;
+        float percTundra  = totalCount > 0 ? (float) meeblesTundra / totalCount : 0.25f;
+
+        // Determine how many meebles to draw for each type
+        int volcanoCount = Math.round(visibleMeebles * percVolcano);
+        int forestCount  = Math.round(visibleMeebles * percForest);
+        int desertCount  = Math.round(visibleMeebles * percDesert);
+        int tundraCount  = Math.round(visibleMeebles * percTundra);
+
+        // Add meebles
+        for(int i = 0; i < volcanoCount; i++) addRandomMeeble(R.drawable.meeble_1);
+        for(int i = 0; i < forestCount; i++)  addRandomMeeble(R.drawable.meeble_2);
+        for(int i = 0; i < desertCount; i++)  addRandomMeeble(R.drawable.meeble_3);
+        for(int i = 0; i < tundraCount; i++)  addRandomMeeble(R.drawable.meeble_4);
 
         Bundle options = new Bundle();
         MYNFCCallbackClass myCallback = new MYNFCCallbackClass();
@@ -351,7 +381,7 @@ public class HomePage extends AppCompatActivity {
                 .show();
     }
 
-    private void addRandomMeeble() {
+    private void addRandomMeeble(int resId) {
 
         int size = 80;
 
@@ -372,7 +402,7 @@ public class HomePage extends AppCompatActivity {
             int randomY = paddingTop + (int)(Math.random() * (usableHeight - size));
 
             ImageView meeble = new ImageView(this);
-            meeble.setImageResource(R.drawable.meeble_1);
+            meeble.setImageResource(resId);
 
             FrameLayout.LayoutParams params =
                     new FrameLayout.LayoutParams(size, size);
@@ -398,5 +428,26 @@ public class HomePage extends AppCompatActivity {
         animator.setRepeatMode(ObjectAnimator.REVERSE);
 
         animator.start();
+    }
+
+    public static void saveMeeblesData(Context context, int volcano, int forest, int desert, int tundra) {
+        SharedPreferences prefs = context.getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+        prefs.edit()
+                .putInt("meeble_count", volcano + forest + desert + tundra)
+                .putInt("meebles_volcano", volcano)
+                .putInt("meebles_forest", forest)
+                .putInt("meebles_desert", desert)
+                .putInt("meebles_tundra", tundra)
+                .apply();
+    }
+
+    public static int[] loadMeeblesData(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+        return new int[]{
+                prefs.getInt("meebles_volcano", 0),
+                prefs.getInt("meebles_forest", 0),
+                prefs.getInt("meebles_desert", 0),
+                prefs.getInt("meebles_tundra", 0)
+        };
     }
 }
