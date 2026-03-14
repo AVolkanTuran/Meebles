@@ -109,6 +109,33 @@ public class EnvironmentPage extends AppCompatActivity {
             public void onClick(View v) {
                 if(!isProcessing){
                     Intent i = new Intent(getApplicationContext(), InfoPage.class);
+                    // Send environment type
+                    i.putExtra("biome", (int) envData.getEnvironmentType());
+
+                    // Send city level
+                    i.putExtra("level", (int) envData.getCityType());
+
+                    // Calculate correct growth rate
+                    double rate;
+                    switch(envData.getEnvironmentType()){
+                        case MeebleConstants.ENV_VOLCANO:
+                            rate = 0.5;
+                            break;
+                        case MeebleConstants.ENV_FOREST:
+                            rate = 2.0;
+                            break;
+                        case MeebleConstants.ENV_DESERT:
+                            rate = 1.0;
+                            break;
+                        case MeebleConstants.ENV_TUNDRA:
+                            rate = 1.5;
+                            break;
+                        default:
+                            rate = 1.0;
+                    }
+
+                    i.putExtra("growthRate", rate);
+
                     startActivity(i);
                 }
             }
