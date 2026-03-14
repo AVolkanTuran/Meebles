@@ -2,6 +2,7 @@ package edu.fandm.volkanwill.meebles;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -39,6 +40,9 @@ public class EnvironmentPage extends AppCompatActivity {
 
     private long openedAt;
     private AlertDialog writingDialog;
+
+    private boolean firstCity;
+    private SharedPreferences prefs;
     private int currentMeebles;
 
     FrameLayout meebleContainer;
@@ -89,6 +93,15 @@ public class EnvironmentPage extends AppCompatActivity {
         meebleCountView  = (TextView) findViewById(R.id.meeble_count);
 
         envData = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
+
+        prefs = getSharedPreferences("meebles_prefs", MODE_PRIVATE);
+        firstCity = prefs.getBoolean("first_city", true);
+
+        if(envData.getCityType() == MeebleConstants.CITY && firstCity){
+            showFirstCityDialog();
+            prefs.edit().putBoolean("first_city", false).apply();
+        }
+
 
         adapter = NfcAdapter.getDefaultAdapter(this);
 
@@ -165,9 +178,13 @@ public class EnvironmentPage extends AppCompatActivity {
         @Override
         public void onTagDiscovered(Tag tag){
             if (System.currentTimeMillis() - openedAt < 1500) return;
-
             if (isProcessing) return;
             isProcessing = true;
+
+            if(envData.getCityType() == MeebleConstants.CITY && firstCity){
+                runOnUiThread(() -> showFirstCityDialog());
+                prefs.edit().putBoolean("first_city", false).apply();
+            }
 
             EnvironmentData updatedData = HomePage.growMeebles(envData);
 
@@ -212,9 +229,10 @@ public class EnvironmentPage extends AppCompatActivity {
                 else if ((data.getMeebleCount() - value) < 2) {
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "There needs to be at least 2 Meebles in a city!", Toast.LENGTH_LONG).show());
                 }
-                else if(data.getMeebleCount() + value > 4000000){
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You reached the maximum number of Meebles in a city.", Toast.LENGTH_LONG).show());
+                else if((long) currentMeebles + value > Integer.MAX_VALUE){
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You reached the maximum number of Meebles on your device.", Toast.LENGTH_LONG).show());
                 }
+
             } else if(selectedId == R.id.deposit){
                 if(currentMeebles >= value && data.getMeebleCount() + value <= 4000000){
                     data.setMeebleCount(data.getMeebleCount()+value);
@@ -239,8 +257,8 @@ public class EnvironmentPage extends AppCompatActivity {
                 else if(currentMeebles < value) {
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You don't have enough Meebles.", Toast.LENGTH_LONG).show());
                 }
-                else if(currentMeebles + value > 0){
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You reached the maximum number of Meebles on your device.", Toast.LENGTH_LONG).show());
+                else if((long) data.getMeebleCount() + value > 4000000){
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "You reached the maximum number of Meebles in a city.", Toast.LENGTH_LONG).show());
                 }
             }
 
@@ -284,6 +302,12 @@ public class EnvironmentPage extends AppCompatActivity {
             finally{
                 dismissWritingDialog();
                 isProcessing = false;
+            }
+
+
+            if(envData.getCityType() == MeebleConstants.CITY && firstCity){
+                runOnUiThread(() -> showFirstCityDialog());
+                prefs.edit().putBoolean("first_city", false).apply();
             }
         }
     }
@@ -392,5 +416,13 @@ public class EnvironmentPage extends AppCompatActivity {
                 writingDialog.dismiss();
             }
         });
+    }
+
+    private void showFirstCityDialog(){
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Congratulations!")
+                .setMessage("Your Meebles created a city for the first time! You can keep playing with Meebles to make more cities!")
+                .setPositiveButton("Awesome!", null)
+                .show();
     }
 }
