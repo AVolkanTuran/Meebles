@@ -1,6 +1,9 @@
 package edu.fandm.volkanwill.meebles;
 
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,5 +33,31 @@ public class MuseumMapPage extends AppCompatActivity {
         exit.setOnClickListener(v -> {
             finish();
         });
+    }
+
+    //Added this code to ignore scanning
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+        if(adapter != null) {
+            // Enable reader mode but do nothing on tag discovered
+            adapter.enableReaderMode(this, new NfcAdapter.ReaderCallback() {
+                @Override
+                public void onTagDiscovered(Tag tag) {
+                    // intentionally empty to ignore tags
+                    Log.d("NFC_IGNORE", "Tag scanned but ignored on WelcomePage");
+                }
+            }, NfcAdapter.FLAG_READER_NFC_A, null);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+        if(adapter != null) {
+            adapter.disableReaderMode(this);
+        }
     }
 }

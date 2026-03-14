@@ -34,30 +34,20 @@
         app:layout_constraintLeft_toRightOf="@id/meebles_label"
         android:layout_marginStart="10dp"/>
 
-    <!-- House background shape -->
-    <View
-        android:id="@+id/house_button_bg"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:background="@drawable/house_button_background"
-        app:layout_constraintTop_toTopOf="@id/meebles_label"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="30dp"/>
+    <FrameLayout
+        android:id="@+id/meebles_container"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:background="#66EDF4C1"
+        android:padding="10dp"
 
-    <!-- House Button (Future Meeble World) -->
-    <ImageButton
-        android:id="@+id/house_button"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_house"
-        android:padding="4dp"
-        android:contentDescription="Meeble House"
-        android:scaleType="centerInside"
-        app:layout_constraintTop_toTopOf="@id/house_button_bg"
-        app:layout_constraintBottom_toBottomOf="@id/house_button_bg"
-        app:layout_constraintLeft_toLeftOf="@id/house_button_bg"
-        app:layout_constraintRight_toRightOf="@id/house_button_bg"/>
+        app:layout_constraintTop_toBottomOf="@id/meebles_label"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"/>
 
     <!-- Read NFC Tag Button -->
     <Button
@@ -68,10 +58,10 @@
         android:textSize="28sp"
         android:textColor="#EB5A3D"
         android:backgroundTint="#EDF4C1"
-        app:layout_constraintTop_toBottomOf="@id/meebles_label"
+        app:layout_constraintTop_toBottomOf="@id/meebles_container"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="40dp"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"/>
 
@@ -87,7 +77,7 @@
         app:layout_constraintTop_toBottomOf="@id/read_tag_button"
         app:layout_constraintLeft_toLeftOf="@id/read_tag_button"
         app:layout_constraintRight_toRightOf="@id/read_tag_button"
-        android:layout_marginTop="40dp"/>
+        android:layout_marginTop="20dp"/>
 
     <Button
         android:id="@+id/tutorial_button"
@@ -99,9 +89,9 @@
         android:textColor="#EB5A3D"
         android:textSize="30sp"
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="50dp"/>
+        app:layout_constraintTop_toBottomOf="@id/map_button"
+        app:layout_constraintLeft_toLeftOf="@id/map_button"
+        app:layout_constraintRight_toRightOf="@id/map_button"
+        android:layout_marginTop="20dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

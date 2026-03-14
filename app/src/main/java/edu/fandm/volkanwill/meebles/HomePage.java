@@ -29,10 +29,16 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Map;
+
+import android.animation.ObjectAnimator;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 public class HomePage extends AppCompatActivity {
 
-    public static NfcAdapter adapter;
+    public static NfcAdapter adapter; //Removed the public static so that we can't scan in other pages
+    FrameLayout meebleContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,8 @@ public class HomePage extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        meebleContainer = findViewById(R.id.meebles_container);
 
         adapter = NfcAdapter.getDefaultAdapter(this);
 
@@ -102,7 +110,18 @@ public class HomePage extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         TextView counter = findViewById(R.id.meebles_counter);
-        counter.setText(String.valueOf(loadMeebles(this)));
+
+        int count = loadMeebles(this);
+        counter.setText(String.valueOf(count));
+
+        meebleContainer.removeAllViews();
+
+        int visibleMeebles = Math.min(50, (int)Math.log10(count + 1) * 12); //Make the meebles appear in density instead of their actual numbers
+
+        for(int i = 0; i < visibleMeebles; i++){
+            addRandomMeeble();
+        }
+
         Bundle options = new Bundle();
         MYNFCCallbackClass myCallback = new MYNFCCallbackClass();
         adapter.enableReaderMode(this, myCallback, NfcAdapter.FLAG_READER_NFC_A,options);
@@ -111,7 +130,9 @@ public class HomePage extends AppCompatActivity {
     @Override
     protected  void onPause() {
         super.onPause();
-        adapter.disableReaderMode(this);
+        if (adapter != null) {
+            adapter.disableReaderMode(this);
+        }
     }
     private class MYNFCCallbackClass implements NfcAdapter.ReaderCallback {
         @Override
@@ -328,5 +349,54 @@ public class HomePage extends AppCompatActivity {
                     startActivity(i);
                 })
                 .show();
+    }
+
+    private void addRandomMeeble() {
+
+        int size = 80;
+
+        meebleContainer.post(() -> {
+
+            int paddingLeft = meebleContainer.getPaddingLeft();
+            int paddingRight = meebleContainer.getPaddingRight();
+            int paddingTop = meebleContainer.getPaddingTop();
+            int paddingBottom = meebleContainer.getPaddingBottom();
+
+            int containerWidth = meebleContainer.getWidth();
+            int containerHeight = meebleContainer.getHeight();
+
+            int usableWidth = containerWidth - paddingLeft - paddingRight;
+            int usableHeight = containerHeight - paddingTop - paddingBottom;
+
+            int randomX = paddingLeft + (int)(Math.random() * (usableWidth - size));
+            int randomY = paddingTop + (int)(Math.random() * (usableHeight - size));
+
+            ImageView meeble = new ImageView(this);
+            meeble.setImageResource(R.drawable.meeble_1);
+
+            FrameLayout.LayoutParams params =
+                    new FrameLayout.LayoutParams(size, size);
+
+            params.leftMargin = randomX;
+            params.topMargin = randomY;
+
+            meeble.setLayoutParams(params);
+
+            meebleContainer.addView(meeble);
+
+            startFloatingAnimation(meeble);
+        });
+    }
+
+    private void startFloatingAnimation(View view) {
+
+        ObjectAnimator animator =
+                ObjectAnimator.ofFloat(view, "translationY", -10f, 10f);
+
+        animator.setDuration(1500 + (int)(Math.random()*1000));
+        animator.setRepeatCount(ObjectAnimator.INFINITE);
+        animator.setRepeatMode(ObjectAnimator.REVERSE);
+
+        animator.start();
     }
 }

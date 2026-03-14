@@ -1,5 +1,6 @@
 package edu.fandm.volkanwill.meebles;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
@@ -7,7 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +38,8 @@ public class EnvironmentPage extends AppCompatActivity {
 
     private int currentMeebles;
 
+    FrameLayout meebleContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +55,9 @@ public class EnvironmentPage extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
+        meebleContainer = findViewById(R.id.meebles_container);
+
         currentMeebles = HomePage.loadMeebles(getApplicationContext());
-        envTypeView = (TextView) findViewById(R.id.environment_type);
-        cityTypeView =  (TextView) findViewById(R.id.city_type);
         meebleCountView  = (TextView) findViewById(R.id.meeble_count);
 
         envData = (EnvironmentData) getIntent().getSerializableExtra("environment_data");
@@ -99,15 +104,6 @@ public class EnvironmentPage extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
         adapter.disableReaderMode(this);
-    }
-
-    private void updateUI(EnvironmentData data){
-        String envTypeText = "Environment: " + MeebleConstants.envTypeToString(data.getEnvironmentType());
-        envTypeView.setText(envTypeText);
-        String cityTypeText = "Type: " + MeebleConstants.cityTypeToString(data.getCityType());
-        cityTypeView.setText(cityTypeText);
-        String meebleCountText = data.getMeebleCount() + " Meeble(s)";
-        meebleCountView.setText(meebleCountText);
     }
 
     private class MYNFCCallBackClass implements NfcAdapter.ReaderCallback {
@@ -192,5 +188,85 @@ public class EnvironmentPage extends AppCompatActivity {
                 isProcessing = false;
             }
         }
+    }
+
+    private void updateUI(EnvironmentData data){
+        // Update the Meeble count with number
+        meebleCountView.setText(data.getMeebleCount() + " Meeble(s)");
+
+        // Update bottom panels
+        TextView bottomCityText = findViewById(R.id.bottom_city_text);
+        ImageView bottomCityImage = findViewById(R.id.bottom_city_image);
+        bottomCityText.setText(MeebleConstants.cityTypeToString(data.getCityType()));
+        int cityResId = getResources().getIdentifier(
+                "city_" + data.getCityType(), "drawable", getPackageName());
+        bottomCityImage.setImageResource(cityResId);
+
+        TextView bottomEnvText = findViewById(R.id.bottom_env_text);
+        ImageView bottomEnvImage = findViewById(R.id.bottom_env_image);
+        bottomEnvText.setText(MeebleConstants.envTypeToString(data.getEnvironmentType()));
+        int envResId = getResources().getIdentifier(
+                "environment_" + data.getEnvironmentType(), "drawable", getPackageName());
+        bottomEnvImage.setImageResource(envResId);
+
+        // Populate meebles in container
+        meebleContainer.removeAllViews();
+
+        int maxAnimatedMeebles = 100;
+        int meebleCount = data.getMeebleCount();
+
+        // Minimum meebles to display even if count is very small
+        int minVisibleMeebles = 2;
+
+        // Use a density function: log-based curve + minimum
+        int visibleMeebles = Math.max(minVisibleMeebles,
+                Math.min(maxAnimatedMeebles,
+                        (int)(Math.log10(meebleCount + 1) * 12)));
+
+        for(int i = 0; i < visibleMeebles; i++){
+            addRandomMeeble(data.getEnvironmentType());
+        }
+    }
+
+    private void addRandomMeeble(char envType) {
+        int size = 80;
+
+        meebleContainer.post(() -> {
+            int paddingLeft = meebleContainer.getPaddingLeft();
+            int paddingRight = meebleContainer.getPaddingRight();
+            int paddingTop = meebleContainer.getPaddingTop();
+            int paddingBottom = meebleContainer.getPaddingBottom();
+
+            int containerWidth = meebleContainer.getWidth();
+            int containerHeight = meebleContainer.getHeight();
+
+            int usableWidth = containerWidth - paddingLeft - paddingRight;
+            int usableHeight = containerHeight - paddingTop - paddingBottom;
+
+            int randomX = paddingLeft + (int)(Math.random() * (usableWidth - size));
+            int randomY = paddingTop + (int)(Math.random() * (usableHeight - size));
+
+            ImageView meeble = new ImageView(this);
+            int meebleResId = getResources().getIdentifier(
+                    "meeble_" + envType, "drawable", getPackageName());
+            meeble.setImageResource(meebleResId);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
+            params.leftMargin = randomX;
+            params.topMargin = randomY;
+            meeble.setLayoutParams(params);
+
+            meebleContainer.addView(meeble);
+
+            startFloatingAnimation(meeble);
+        });
+    }
+
+    private void startFloatingAnimation(View view) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "translationY", -10f, 10f);
+        animator.setDuration(1500 + (int)(Math.random()*1000));
+        animator.setRepeatCount(ObjectAnimator.INFINITE);
+        animator.setRepeatMode(ObjectAnimator.REVERSE);
+        animator.start();
     }
 }
