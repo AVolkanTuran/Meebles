@@ -33,6 +33,8 @@ import android.animation.ObjectAnimator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.google.android.material.button.MaterialButton;
+
 public class HomePage extends AppCompatActivity {
 
     public static NfcAdapter adapter; //Removed the public static so that we can't scan in other pages
@@ -80,12 +82,17 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
-        //I don't know what to do with this button
-        //TODO: For Volkan to implement
-        Button readTag = findViewById(R.id.read_tag_button);
-
+        MaterialButton readTag = findViewById(R.id.read_tag_button);
         readTag.setOnClickListener(v -> {
-            Toast.makeText(this,"Scan a Meebles city tag!",Toast.LENGTH_SHORT).show();
+            if (readTag.isChecked()) {
+                readTag.setText("Read Meebles Tag: On");
+                Bundle options = new Bundle();
+                MYNFCCallbackClass myCallback = new MYNFCCallbackClass();
+                adapter.enableReaderMode(this, myCallback, NfcAdapter.FLAG_READER_NFC_A,options);
+            } else {
+                readTag.setText("Read Meebles Tag: Off");
+                adapter.disableReaderMode(this);
+            }
         });
 
         Button map_button = findViewById(R.id.map_button);
@@ -151,10 +158,6 @@ public class HomePage extends AppCompatActivity {
         for(int i = 0; i < forestCount; i++)  addRandomMeeble(R.drawable.meeble_2);
         for(int i = 0; i < desertCount; i++)  addRandomMeeble(R.drawable.meeble_3);
         for(int i = 0; i < tundraCount; i++)  addRandomMeeble(R.drawable.meeble_4);
-
-        Bundle options = new Bundle();
-        MYNFCCallbackClass myCallback = new MYNFCCallbackClass();
-        adapter.enableReaderMode(this, myCallback, NfcAdapter.FLAG_READER_NFC_A,options);
     }
 
     @Override
