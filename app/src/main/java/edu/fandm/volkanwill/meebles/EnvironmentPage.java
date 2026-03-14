@@ -264,10 +264,18 @@ public class EnvironmentPage extends AppCompatActivity {
         // Minimum meebles to display even if count is very small
         int minVisibleMeebles = 2;
 
-        // Use a density function: log-based curve + minimum
+        // Use a density function: linear until a certain value, log-based curve + minimum for larger values
+        int func;
+        if(meebleCount <= 14){
+            func = meebleCount;
+        }
+        else{
+            func = (int) (Math.log10(meebleCount + 1) * 12);
+        }
+
         int visibleMeebles = Math.max(minVisibleMeebles,
                 Math.min(maxAnimatedMeebles,
-                        (int)(Math.log10(meebleCount + 1) * 12)));
+                        func));
 
         for(int i = 0; i < visibleMeebles; i++){
             addRandomMeeble(data.getEnvironmentType());
