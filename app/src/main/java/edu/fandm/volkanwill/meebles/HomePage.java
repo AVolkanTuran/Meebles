@@ -409,7 +409,7 @@ public class HomePage extends AppCompatActivity {
 
         new AlertDialog.Builder(this)
                 .setTitle("Welcome!")
-                .setMessage("Do you know what exponential growth is?")
+                .setMessage("Have you ever used this educational app before?")
                 .setPositiveButton("Yes", (dialog, which) -> {
 
                     SharedPreferences prefs = getSharedPreferences("meebles_prefs", MODE_PRIVATE);

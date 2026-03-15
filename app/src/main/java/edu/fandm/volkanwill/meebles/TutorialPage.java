@@ -35,8 +35,8 @@ public class TutorialPage extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
-        //TODO: Can we even animate the exponential growth?
-        //TODO: Add cartoon meeble illustrations and make the slides look nicer
+        //DONE: Can we even animate the exponential growth?
+        //DONE: Add cartoon meeble illustrations and make the slides look nicer
         ViewPager2 pager = findViewById(R.id.tutorial_pager);
         TutorialAdapter adapter = new TutorialAdapter();
 
