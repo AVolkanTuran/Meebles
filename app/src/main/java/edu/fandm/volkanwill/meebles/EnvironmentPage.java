@@ -100,6 +100,7 @@ public class EnvironmentPage extends AppCompatActivity {
         if(envData.getCityType() == MeebleConstants.CITY && firstCity){
             showFirstCityDialog();
             prefs.edit().putBoolean("first_city", false).apply();
+            firstCity = false;
         }
 
 
@@ -184,6 +185,7 @@ public class EnvironmentPage extends AppCompatActivity {
             if(envData.getCityType() == MeebleConstants.CITY && firstCity){
                 runOnUiThread(() -> showFirstCityDialog());
                 prefs.edit().putBoolean("first_city", false).apply();
+                firstCity = false;
             }
 
             EnvironmentData updatedData = HomePage.growMeebles(envData);
@@ -308,6 +310,7 @@ public class EnvironmentPage extends AppCompatActivity {
             if(envData.getCityType() == MeebleConstants.CITY && firstCity){
                 runOnUiThread(() -> showFirstCityDialog());
                 prefs.edit().putBoolean("first_city", false).apply();
+                firstCity = false;
             }
         }
     }
